@@ -102,7 +102,7 @@ const ItemDetails = ({ route, navigation }) => {
 
                     {/* Duration */}
                     <View style={styles.row_container}>
-                        <Text style={styles.duration_text}>Duration:</Text>
+                        <Text style={styles.duration_text}>Préparation</Text>
                         <Text style={styles.duration_text}>{item?.duration}</Text>
                     </View>
 
@@ -127,7 +127,7 @@ const ItemDetails = ({ route, navigation }) => {
 
                     {/* Add to Cart Button */}
                     <View style={{ margin: SIZES.padding * 2, marginTop: 0 }}>
-                        <CustomButton text='Add to Cart' onPressButton={() => addToCart()} />
+                        <CustomButton text='Ajouter au panier' onPressButton={() => addToCart()} />
                     </View>
 
 

@@ -24,7 +24,7 @@ const OrderList = ({ navigation, orders, deleteOrder }) => {
 
                     {/* Order No */}
                     <View style={styles.row}>
-                        <Text style={styles.order_no_text}>Order : {index + 1}</Text>
+                        <Text style={styles.order_no_text}>Commande : {index + 1}</Text>
 
                         {/* Time */}
                         <View style={{ flexDirection: 'row' }}>
@@ -47,12 +47,12 @@ const OrderList = ({ navigation, orders, deleteOrder }) => {
                     <View style={styles.buttons_container}>
                         <TouchableOpacity style={{ ...styles.buttons, marginRight: 40 }}
                             onPress={() => navigation.navigate('OrderDelivery', { time: item.time + 10 })}>
-                            <Text style={styles.buttons_text}>Track Order</Text>
+                            <Text style={styles.buttons_text}>Suivre</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={{ ...styles.buttons, backgroundColor: 'red' }}
                             onPress={() => deleteOrder(item.oid)}>
-                            <Text style={styles.buttons_text}>Cancel Order</Text>
+                            <Text style={styles.buttons_text}>Annuler</Text>
                         </TouchableOpacity>
                     </View>
 

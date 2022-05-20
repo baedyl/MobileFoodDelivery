@@ -86,7 +86,7 @@ const CartItems = ({ cartItems, getTotal, deleteItem, changeQty, confirmOrder, n
                     </View>
                     {/* Order Button */}
                     <View style={{ margin: SIZES.padding * 2, marginTop: 0 }}>
-                        <CustomButton text='Confirm Order'
+                        <CustomButton text='Confirmer Commande'
                             onPressButton={() => confirmOrder()} />
                     </View>
                 </View>

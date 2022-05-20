@@ -5,17 +5,17 @@ const avatar_3 = require("../assets/images/avatar-3.jpg");
 const avatar_4 = require("../assets/images/avatar-4.jpg");
 const avatar_5 = require("../assets/images/avatar-5.jpg");
 const baked_fries = require("../assets/images/baked-fries.jpg");
-const burger_restaurant_1 = require("../assets/images/burger-restaurant.jpg");
-const burger_restaurant_2 = require("../assets/images/burger-restaurant-2.jpg");
-const chicago_hot_dog = require("../assets/images/chicago-hot-dog.jpg");
-const crispy_chicken_burger = require("../assets/images/crispy-chicken-burger.jpg");
+const afrik_authentik = require("../assets/images/AFRIK-AUTHENTIK.png");
+const chez_aminata = require("../assets/images/CHEZ-AMINATA.png");
+const chez_takinda = require("../assets/images/TAK-2.png");
+const etoiledunord = require("../assets/images/etoiledunord.png");
+const le_gouter = require("../assets/images/LEGOUTEROFF.png");
+const souk = require("../assets/images/souk.png");
 const fries_restaurant = require("../assets/images/fries-restaurant.jpg");
 const hawaiian_pizza = require("../assets/images/hawaiian-pizza.jpg");
 const honey_mustard_chicken_burger = require("../assets/images/honey-mustard-chicken-burger.jpg");
-const hot_dog_restaurant = require("../assets/images/hot-dog-restaurant.jpg");
 const ice_kacang = require("../assets/images/ice-kacang.jpg");
 const japanese_restaurant = require("../assets/images/japanese-restaurant.jpg");
-const kek_lapis_shop = require("../assets/images/kek-lapis-shop.jpg");
 const kek_lapis = require("../assets/images/kek-lapis.jpg");
 const kolo_mee = require("../assets/images/kolo-mee.jpg");
 const nasi_briyani_mutton = require("../assets/images/nasi-briyani-mutton.jpg");
@@ -37,19 +37,19 @@ export default {
     avatar_4,
     avatar_5,
     baked_fries,
-    burger_restaurant_1,
-    burger_restaurant_2,
-    chicago_hot_dog,
-    crispy_chicken_burger,
+    afrik_authentik,
+    chez_aminata,
+    chez_takinda,
+    etoiledunord,
+    le_gouter,
+    souk,
 
     fries_restaurant,
     hawaiian_pizza,
     honey_mustard_chicken_burger,
-    hot_dog_restaurant,
     ice_kacang,
 
     japanese_restaurant,
-    kek_lapis_shop,
     kek_lapis,
     kolo_mee,
     nasi_briyani_mutton,

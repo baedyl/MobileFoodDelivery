@@ -12,7 +12,7 @@
       android:theme="@style/BootTheme"> <!-- Replace @style/AppTheme with @style/BootTheme -->
       <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="Your Google maps API Key Here"/>
+        android:value="AIzaSyDRThURWQTcE9HVIMR98iYMiYkdIIuJpuA"/>
       
       <!-- You will also only need to add this uses-library tag -->
       <uses-library android:name="org.apache.http.legacy" android:required="false"/>

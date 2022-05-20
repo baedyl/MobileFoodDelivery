@@ -206,7 +206,7 @@ const Restaurant = ({ route, navigation }) => {
 
           {/* Duration */}
           <View style={styles.row_container}>
-            <Text style={styles.duration_text}>Duration:</Text>
+            <Text style={styles.duration_text}>Préparation</Text>
             <Text style={styles.duration_text}>{item?.duration}</Text>
           </View>
 

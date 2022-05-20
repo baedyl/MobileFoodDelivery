@@ -16,6 +16,11 @@ const updateSchema = yup.object({
         .label('Name')
         .required()
         .min(3),
+    
+    address: yup.string()
+        .label('Adresse')
+        .required()
+        .min(6),
 
     phone: yup.string()
         .label('Phone number')
@@ -37,6 +42,7 @@ const updateUser = async (values, navigation, user, image, setClicked) => {
             await userReference
                 .update({
                     name: values.name,
+                    address: values.address,
                     phone: values.phone,
                 }).then(() => {
                     console.log("User updated successfully")
@@ -59,6 +65,7 @@ const updateUser = async (values, navigation, user, image, setClicked) => {
             await userReference
                 .update({
                     name: values.name,
+                    address: values.address,
                     phone: values.phone,
                     photoUrl: url
                 }).then(() => {
@@ -169,6 +176,17 @@ const UpdateProfile = ({ route, navigation }) => {
                                         onBlur={props.handleBlur('name')} />
                                     {props.touched.name && props.errors.name && (
                                         <Text style={Globalstyles.errorText}>{props.errors.name}</Text>
+                                    )}
+
+                                    {/* Address field */}
+                                    <TextInput
+                                        style={Globalstyles.input}
+                                        placeholder={user.address || 'Adresse'}
+                                        onChangeText={props.handleChange('address')}
+                                        value={props.values.address}
+                                        onBlur={props.handleBlur('address')} />
+                                    {props.touched.address && props.errors.address && (
+                                        <Text style={Globalstyles.errorText}>{props.errors.address}</Text>
                                     )}
 
                                     {/* Phone number field */}

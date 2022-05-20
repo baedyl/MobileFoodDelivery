@@ -87,6 +87,19 @@ const Account = ({ navigation }) => {
                             <Text style={styles.contact_text}> {userInfo.email}</Text>
                         </View>
 
+                        {/* Address */}
+                        <View style={{ flexDirection: 'row', marginTop: SIZES.padding * 2 }}>
+                            <Image
+                                source={icons.home}
+                                style={{
+                                    width: 20,
+                                    height: 20,
+                                    tintColor: COLORS.black
+                                }}
+                            />
+                            <Text style={styles.contact_text}> {userInfo.address}</Text>
+                        </View>
+
                         {/* Phone */}
                         <View style={{ flexDirection: 'row', marginTop: SIZES.padding }}>
                             <Image
