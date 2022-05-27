@@ -49,13 +49,14 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/core": "7.12.9",
+    "@babel/core": "^7.18.2",
     "@babel/runtime": "7.12.5",
     "@react-native-community/eslint-config": "1.1.0",
     "babel-jest": "25.5.1",
     "eslint": "6.8.0",
     "jest": "25.5.4",
-    "metro-react-native-babel-preset": "0.59.0",
+    "metro-react-native-babel-preset": "^0.71.0",
+    "react-native-dotenv": "^3.3.1",
     "react-test-renderer": "16.13.1"
   },
   "jest": {

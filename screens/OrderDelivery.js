@@ -25,9 +25,9 @@ import MapView, {
   Polyline,
 } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
+import {GOOGLE_API_KEY} from '@env';
 // import {usePubNub} from 'pubnub-react';
 
-const GOOGLE_API_KEY = "AIzaSyBSWfme3FulpbRxcMzQ9JOaRUJPWIn2vKo";
 const screen = Dimensions.get("window");
 
 // Rabat, Morocco coordinates
