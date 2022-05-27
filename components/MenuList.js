@@ -2,7 +2,7 @@ import React from "react";
 import { COLORS, icons, SIZES, images, FONTS } from '../constants';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from "react-native";
 
-const MenuList = ({ navigation, menu, onPressFavorite, favorites, categorySelected, categories }) => {
+const MenuList = ({ navigation, menu, restaurant, onPressFavorite, favorites, categorySelected, categories }) => {
 
     function getCategoryNameById(id) {
         let category = categories.filter(a => a.id == id)
@@ -17,7 +17,8 @@ const MenuList = ({ navigation, menu, onPressFavorite, favorites, categorySelect
             <TouchableOpacity style={styles.container}
                 onPress={() => {
                     navigation.navigate('ItemDetails', {
-                        currentItem: item, currentCategory: (getCategoryNameById(item.category))
+                        currentItem: item, currentCategory: (getCategoryNameById(item.category)),
+                        restaurant: restaurant
                     });
                 }}>
 

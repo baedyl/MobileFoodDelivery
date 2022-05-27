@@ -10,7 +10,7 @@ const Cart = ({ navigation }) => {
   const { user } = useSelector((state) => state.userReducer);
   const [userInfo, setUserInfo] = useState(null);
   const [cartItems, setCartItems] = useState(null);
-  const cartReference = firebase.app().database(DATABASE_URL).ref("/Cart/");
+  const cartReference = firebase.app().database(DATABASE_URL).ref("/Cart/" + user.uid);
 
   useEffect(() => {
     const currentUser = firebase.auth().currentUser;
@@ -68,6 +68,11 @@ const Cart = ({ navigation }) => {
       uid: user.uid,
       time: total_duration,
       address: userInfo?.address,
+      boutique: cartItems[0].restaurant,
+      valid: false,
+      ready: false,
+      delivered: false,
+      accepted: false,
     });
 
     for (let index = 0; index < cartItems.length; index++) {
@@ -96,7 +101,7 @@ const Cart = ({ navigation }) => {
     firebase
       .app()
       .database(DATABASE_URL)
-      .ref("/Cart/" + name)
+      .ref("/Cart/" + user.uid + '/' + name)
       .remove();
   }
 
@@ -113,7 +118,7 @@ const Cart = ({ navigation }) => {
     const itemReference = firebase
       .app()
       .database(DATABASE_URL)
-      .ref("/Cart/" + item.name);
+      .ref("/Cart/" + user.uid + '/' + item.name);
     if (action == "+") {
       itemReference
         .update({ qty: item.qty + 1, total: (item.qty + 1) * item.price })

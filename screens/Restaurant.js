@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Image,
+  Alert,
 } from "react-native";
 import { Globalstyles } from "../styles/GlobalStyle";
 import {
@@ -38,24 +39,50 @@ const Restaurant = ({ route, navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categorySelected, setCategorySelected] = useState(false);
+  const [cartItems, setCartItems] = useState(null);
+  const cartReference = firebase
+    .app()
+    .database(DATABASE_URL)
+    .ref("/Cart/" + user.uid);
   const [menu, setMenu] = useState(null);
 
   useEffect(() => {
     let { item, currentLocation } = route.params;
     let array = [];
-    console.log(Object.values(item.menu));
-    console.log(typeof item.menu);
-    Object.values(item.menu).forEach((item) => {
-        // let snapshotItem = item.val();
-        array.push(item)
-    })
-    setMenu(array);
-    array = []
-    console.log(array);
-    // setMenu(item.menu);
+    // console.log(Object.values(item.menu));
+    console.log(typeof item.name);
     setRestaurant(item);
     setCurrentLocation(currentLocation);
+    Object.values(item.menu).forEach((item) => {
+      // let snapshotItem = item.val();
+      array.push(item);
+    });
+    setMenu(array);
+    array = [];
+    // console.log(array);
+    // setMenu(item.menu);
     setCategorySelected(false);
+
+    // Setup Cart data
+    if (user) {
+      let array = [];
+      cartReference.on(
+        "value",
+        (snapshot) => {
+          console.log("cart snapshot!");
+          snapshot.forEach((snapshotItem) => {
+            var item = snapshotItem.val();
+            console.log(item);
+            if (item.uid == user.uid) array.push(item);
+          });
+          setCartItems(array);
+          array = [];
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    } else setCartItems([]);
   }, []);
 
   //function for adding item in cart in firebase
@@ -102,6 +129,22 @@ const Restaurant = ({ route, navigation }) => {
     setSelectedCategory(category);
   }
 
+  //function to delete a cart item
+  function deleteItem(name) {
+    firebase
+      .app()
+      .database(DATABASE_URL)
+      .ref("/Cart/" + user.uid + "/" + name)
+      .remove();
+  }
+
+  function emptyCart() {
+    for (let index = 0; index < cartItems.length; index++) {
+      // Remove item from cart
+      deleteItem(cartItems[index].name);
+    }
+  }
+
   function addToFavorite(favoriteItem) {
     if (user) {
       const REFERENCE_URL = "/Favorite/" + favoriteItem.name;
@@ -139,10 +182,29 @@ const Restaurant = ({ route, navigation }) => {
             paddingLeft: SIZES.padding * 2,
             justifyContent: "center",
           }}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (cartItems?.length > 0) {
+              Alert.alert("Attention", "Vider votre panier ?", [
+                {
+                  text: "NON",
+                  onPress: () => console.warn("NO Pressed"),
+                  style: "cancel",
+                },
+                {
+                  text: "OUI",
+                  onPress: () => {
+                    emptyCart();
+                    navigation.goBack();
+                  },
+                },
+              ]);
+            } else {
+              navigation.goBack();
+            }
+          }}
         >
           <Image
-            source={icons.back}
+            source={icons.home}
             resizeMode="contain"
             style={{
               width: 30,
@@ -179,80 +241,6 @@ const Restaurant = ({ route, navigation }) => {
     );
   }
 
-  //function for displaying food item information
-  function renderFoodInfo() {
-    return (
-      <>
-        <View style={{ alignItems: "center" }}>
-          <View style={styles.food_image}>
-            {/* Food Image */}
-            <Image
-              source={{ uri: item?.photoUrl }}
-              resizeMode="contain"
-              style={{
-                width: SIZES.width - 24,
-                height: "95%",
-              }}
-            />
-          </View>
-        </View>
-
-        <View style={styles.bottom_container}>
-          {/* Name */}
-          <Text style={styles.name}>{item?.name}</Text>
-
-          {/* Description */}
-          <Text style={styles.description}>{item?.description}</Text>
-
-          {/* Duration */}
-          <View style={styles.row_container}>
-            <Text style={styles.duration_text}>Préparation</Text>
-            <Text style={styles.duration_text}>{item?.duration}</Text>
-          </View>
-
-          <View style={styles.row_container}>
-            {/* Price */}
-            <Text style={styles.price}>{item?.price} DH</Text>
-
-            {/* Rating */}
-            <View style={{ flexDirection: "row" }}>
-              <Image
-                source={icons.star}
-                resizeMode="contain"
-                style={{
-                  width: 23,
-                  height: 23,
-                }}
-              />
-              <Text style={styles.rating}>{item?.rating}</Text>
-            </View>
-          </View>
-
-          {/* Add to Cart Button */}
-          <View style={{ margin: SIZES.padding * 2, marginTop: 0 }}>
-            <CustomButton
-              text="Ajouter au panier"
-              onPressButton={() => addToCart()}
-            />
-          </View>
-        </View>
-
-        {isIphoneX() && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: -34,
-              left: 0,
-              right: 0,
-              height: 34,
-              backgroundColor: COLORS.white,
-            }}
-          ></View>
-        )}
-      </>
-    );
-  }
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView style={Globalstyles.container_1}>
@@ -261,6 +249,11 @@ const Restaurant = ({ route, navigation }) => {
         <MenuList
           navigation={navigation}
           menu={menu}
+          restaurant={{
+            name: restaurant?.name,
+            address: restaurant?.address,
+            location: restaurant?.location,
+          }}
           onPressFavorite={addToFavorite}
           favorites={favorites}
           categories={categoryData}

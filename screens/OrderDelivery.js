@@ -8,9 +8,26 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { COLORS, icons, SIZES, images, FONTS } from "../constants";
-import MapView, { PROVIDER_GOOGLE, Marker, AnimatedRegion, Polyline } from "react-native-maps";
+import { useSelector } from "react-redux";
+import { firebase } from "@react-native-firebase/database";
+import {
+  COLORS,
+  icons,
+  SIZES,
+  images,
+  FONTS,
+  DATABASE_URL,
+} from "../constants";
+import MapView, {
+  PROVIDER_GOOGLE,
+  Marker,
+  AnimatedRegion,
+  Polyline,
+} from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+// import {usePubNub} from 'pubnub-react';
 
+const GOOGLE_API_KEY = "AIzaSyBSWfme3FulpbRxcMzQ9JOaRUJPWIn2vKo";
 const screen = Dimensions.get("window");
 
 // Rabat, Morocco coordinates
@@ -21,6 +38,7 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const OrderDelivery = ({ route }) => {
+  const { deliver } = useSelector((state) => state.deliverReducer);
 
   const mapView = React.useRef();
   const [currentRestaurant, setCurrentRestaurant] = useState(null);
@@ -30,67 +48,115 @@ const OrderDelivery = ({ route }) => {
   const [region, setRegion] = useState(null);
   const [duration, setDuration] = useState(0);
   const [coordinates, setCoordinates] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+
+  // const pubnub = usePubNub();
+
+  let thisState = {
+    latitude: userInfo?.location?.latitude,
+    longitude: userInfo?.location?.longitude,
+    coordinate: new AnimatedRegion({
+      latitude: LATITUDE,
+      longitude: LONGITUDE,
+      latitudeDelta: 0,
+      longitudeDelta: 0,
+    }),
+  };
 
   useEffect(() => {
+    const currentUser = firebase.auth().currentUser;
+    console.log("current: ", currentUser);
+    if (currentUser) {
+      const userReference = firebase
+        .app()
+        .database(DATABASE_URL)
+        .ref("/Users/" + currentUser.uid);
+      userReference.on("value", (snapshot) => {
+        console.log("WE IN!");
+        setUserInfo(snapshot.val());
+        console.log("user: ", snapshot.val());
+        const userLocation = snapshot.val().location;
+        console.log("user: ", userLocation);
+        thisState.latitude = userLocation?.latitude;
+        thisState.longitude = userLocation?.longitude;
+        // thisState = {
+        //   latitude: userLocation?.latitude,
+        //   longitude: userLocation?.longitude,
+        //   coordinate: new AnimatedRegion({
+        //     latitude: LATITUDE,
+        //     longitude: LONGITUDE,
+        //     latitudeDelta: 0,
+        //     longitudeDelta: 0,
+        //   }),
+        // };
+
+        const locations = {
+          streetName: deliver.boutique?.address,
+          myLocation: {
+            latitude: userLocation?.latitude,
+            longitude: userLocation?.longitude,
+          },
+          resLocation: {
+            latitude: deliver.boutique?.location.latitude,
+            longitude: deliver.boutique?.location.longitude,
+          },
+        };
+
+        let fromLoc = locations.resLocation;
+        let toLoc = locations.myLocation;
+        let street = locations.streetName;
+        let mapRegion = {
+          latitude: (fromLoc.latitude + toLoc.latitude) / 2,
+          longitude: (fromLoc.longitude + toLoc.longitude) / 2,
+        };
+
+        setStreetName(street);
+        setFromLocation(fromLoc);
+        setToLocation(toLoc);
+        setRegion(mapRegion);
+        setCoordinates([
+          { latitude: fromLoc.latitude, longitude: fromLoc.longitude },
+          { latitude: toLoc.latitude, longitude: toLoc.longitude },
+        ]);
+      });
+    }
+
+    if (!mapView.current) {
+      // do componentDidMount logic
+      console.log("componentDidMount ", userInfo?.location);
+      // subscribeToPubNub();
+      mapView.current = true;
+    } else {
+      // do componentDidUpdate logic
+      console.log("deliver update ", deliver);
+    }
+
     let { time } = route.params;
     setDuration(time);
-
-    const locations = {
-      streetName: "Adresse de livraison",
-      myLocation: {
-        latitude: 25.410776,
-        longitude: 68.275936,
-      },
-      resLocation: {
-        latitude: 25.411011,
-        longitude: 68.271427,
-      },
-    };
-
-    let fromLoc = locations.resLocation;
-    let toLoc = locations.myLocation;
-    let street = locations.streetName;
-    let mapRegion = {
-      latitude: (fromLoc.latitude + toLoc.latitude) / 2,
-      longitude: (fromLoc.longitude + toLoc.longitude) / 2,
-      latitudeDelta: Math.abs(fromLoc.latitude - toLoc.latitude) * 2,
-      longitudeDelta: Math.abs(fromLoc.longitude - toLoc.longitude) * 2,
-    };
-
-    setCurrentRestaurant({
-      courier: {
-        avatar: images.avatar,
-        name: "Ahmad",
-        phone: "03342838233",
-      },
-    });
-
-    setStreetName(street);
-    setFromLocation(fromLoc);
-    setToLocation(toLoc);
-    setRegion(mapRegion);
-    setCoordinates([
-      { latitude: fromLoc.latitude, longitude: fromLoc.longitude },
-      { latitude: toLoc.latitude, longitude: toLoc.longitude },
-    ]);
   }, []);
 
-  function animate() {
-    const {coordinate} = this.state;
-    const newCoordinate = {
-      latitude: LATITUDE + (Math.random() - 0.5) * (LATITUDE_DELTA / 2),
-      longitude: LONGITUDE + (Math.random() - 0.5) * (LONGITUDE_DELTA / 2),
-    };
+  // subscribeToPubNub = () => {
+  //   pubnub.subscribe({
+  //     channels: ['location'],
+  //     withPresence: true,
+  //   });
+  //   pubnub.getMessage('location', msg => {
+  //     const { coordinate } = this.state;
+  //     const { latitude, longitude } = msg.message;
+  //     const newCoordinate = { latitude, longitude };
 
-    if (Platform.OS === 'android') {
-      if (this.marker) {
-        this.marker._component.animateMarkerToCoordinate(newCoordinate, 500);
-      }
-    } else {
-      // `useNativeDriver` defaults to false if not passed explicitly
-      coordinate.timing({...newCoordinate, useNativeDriver: true}).start();
-    }
-  }
+  //     if (Platform.OS === 'android') {
+  //       if (this.marker) {
+  //         this.marker._component.animateMarkerToCoordinate(newCoordinate, 500);
+  //       }
+  //     } else {
+  //       coordinate.timing(newCoordinate).start();
+  //     }
+
+  //     thisState.latitude = latitude;
+  //     thisState.longitude = longitude;
+  //   });
+  // };
 
   //zoom in function
   function zoomIn() {
@@ -124,7 +190,7 @@ const OrderDelivery = ({ route }) => {
         <View style={styles.innerView_1}>
           <View style={styles.innerView_2}>
             <Image
-              source={images.avatar}
+              source={images.avatar_3}
               style={{
                 height: 25,
                 width: 25,
@@ -149,43 +215,41 @@ const OrderDelivery = ({ route }) => {
       </Marker>
     );
 
+    const getMapRegion = () => ({
+      latitude: thisState.latitude,
+      longitude: thisState.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+    });
+
     return (
       <View style={{ flex: 1 }}>
-        {/* <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          initialRegion={{
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }}
-        >
-          <Marker.Animated
-            ref={(marker) => {
-              this.marker = marker;
-            }}
-            coordinate={this.state.coordinate}
-          />
-        </MapView> */}
         <MapView
           ref={mapView}
           style={{ flex: 1 }}
           provider={PROVIDER_GOOGLE}
-          initialRegion={{
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }}
+          region={getMapRegion()}
+          // initialRegion={{
+          //   latitude: LATITUDE,
+          //   longitude: LONGITUDE,
+          //   latitudeDelta: LATITUDE_DELTA,
+          //   longitudeDelta: LONGITUDE_DELTA,
+          // }}
         >
           {deliveryBoy()}
           {homeIcon()}
 
-          <Polyline
+          {/* <Polyline
             coordinates={coordinates}
             strokeColor="red"
             strokeWidth={3}
+          /> */}
+          <MapViewDirections
+            origin={coordinates[0]}
+            destination={coordinates[1]}
+            apikey={GOOGLE_API_KEY} // insert your API Key here
+            strokeWidth={4}
+            strokeColor="red"
           />
         </MapView>
       </View>
@@ -223,7 +287,11 @@ const OrderDelivery = ({ route }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             {/* Avatar */}
             <Image
-              source={currentRestaurant?.courier.avatar || icons.user}
+              source={
+                (deliver.deliver_by.photoUrl &&
+                  deliver.deliver_by.photoUrl !== "default") ||
+                icons.user
+              }
               style={{
                 width: 50,
                 height: 50,
@@ -233,17 +301,17 @@ const OrderDelivery = ({ route }) => {
 
             {/* Name */}
             <View style={{ flex: 1, marginLeft: SIZES.padding }}>
-              <Text style={styles.name}>{currentRestaurant?.courier.name}</Text>
-              <Text style={styles.deliveryBoy}>Livreur</Text>
+              <Text style={styles.name}>{deliver.deliver_by?.name}</Text>
+              <Text style={styles.deliveryBoy}>
+                {deliver.deliver_by?.phone}
+              </Text>
             </View>
           </View>
 
           {/* phone */}
           <TouchableOpacity
             style={styles.call}
-            onPress={() =>
-              Linking.openURL(`tel:${currentRestaurant?.courier.phone}`)
-            }
+            onPress={() => Linking.openURL(`tel:${deliver.deliver_by?.phone}`)}
           >
             <Image
               source={icons.phone}
@@ -281,7 +349,7 @@ const OrderDelivery = ({ route }) => {
       {fromLocation.latitude && toLocation.latitude ? renderMap() : null}
       {renderDestinationHeader()}
       {renderDeliveryInfo()}
-      {renderZoomButtons()}
+      {/* {renderZoomButtons()} */}
     </View>
   );
 };

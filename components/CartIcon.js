@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 const CartIcon = ({ navigation }) => {
     const { user } = useSelector(state => state.userReducer);
     const [cartItemsNum, setCartItemsNum] = useState(0)
-    const cartReference = firebase.app().database(DATABASE_URL).ref('/Cart/');
+    const cartReference = firebase.app().database(DATABASE_URL).ref('/Cart/' + user.uid);
 
     useEffect(() => {
         if (user) {
